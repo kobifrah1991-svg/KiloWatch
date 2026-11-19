@@ -35,14 +35,34 @@
   .player.show{display:flex}
   .pbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#000}
   .pbar button{background:var(--card);color:var(--txt);border:0;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
-  .pbar .t{font-weight:700;unicode-bidi:plaintext;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .pbar .t{font-weight:700;unicode-bidi:plaintext;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .pbar button{flex:none}
   video{flex:1;width:100%;min-height:0;background:#000}
   .msg{position:absolute;inset:auto 0 40%;text-align:center;color:var(--txt);padding:0 20px;font-size:16px;pointer-events:none}
+  .msg button{pointer-events:auto;margin-top:14px;background:var(--acc);color:var(--on);border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
   .msg.err{color:var(--err)}
   .add{max-width:1200px;margin:24px auto 0;color:var(--sub);font-size:14px}
   .add summary{cursor:pointer;color:var(--acc)}
   .add form{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   .add button{background:var(--acc);color:var(--on);border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+  .more[hidden]{display:none}
+  @media (max-width:600px){#vol{display:none}}
+  .tabs{max-width:1200px;margin:10px auto 0;display:flex;gap:6px}
+  .tab{flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:9px 6px;font:inherit;font-size:14px;cursor:pointer}
+  .tab.on{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:700}
+  .ch{position:relative}
+  .star{position:absolute;top:6px;inset-inline-end:6px;background:rgba(0,0,0,.55);border:0;color:#fff;border-radius:50%;width:32px;height:32px;font-size:17px;line-height:32px;cursor:pointer;padding:0}
+  .star.on{color:#FFD65A}
+  .ctrl{position:absolute;inset:auto 0 0 0;padding:14px 12px 18px;background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;direction:ltr;transition:opacity .25s}
+  .ctrl button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:12px;min-width:46px;height:46px;padding:0 12px;font:inherit;font-size:18px;cursor:pointer}
+  .ctrl button:hover,.ctrl button:focus{background:rgba(31,199,168,.35);outline:none}
+  .ctrl .live{font-size:14px;font-weight:700}
+  .ctrl .live.on{background:#d33}
+  .ctrl input[type=range]{width:110px;accent-color:var(--acc)}
+  .player.idle .ctrl,.player.idle .pbar{opacity:0}
+  .player.idle{cursor:none}
+  .pbar{transition:opacity .25s}
+  .vwrap{position:relative;flex:1;min-height:0;display:flex}
   footer{max-width:1200px;margin:24px auto 40px;padding:0 16px;color:var(--sub);font-size:13px;line-height:1.6}
 </style>
 </head>
@@ -56,6 +76,11 @@
   <div class="controls">
     <select id="list" aria-label="רשימה"></select>
     <input id="q" type="search" placeholder="חיפוש ערוץ…" aria-label="חיפוש">
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="all">📺 הכול</button>
+    <button class="tab" data-tab="fav">★ מועדפים</button>
+    <button class="tab" data-tab="recent">🕘 אחרונים</button>
   </div>
   <div class="chips" id="chips"></div>
 </header>
@@ -72,7 +97,7 @@
   </details>
 </main>
 <footer>
-  צפייה בדפדפן בלי התקנה. חלק מהערוצים לא נפתחים בדפדפן (כתובות לא מאובטחות או ערוצים שחוסמים אתרים), והם מוסתרים כאן. באפליקציה עצמה כל הערוצים עובדים, יש בדיקת ערוצים, מדריך שידורים, הקלטה ועוד.
+  צפייה בדפדפן בלי התקנה. חלק מהערוצים לא נפתחים בדפדפן (כתובות לא מאובטחות, ערוצים שחוסמים אתרים או ערוצים שזמינים רק בחו"ל). ערוץ שלא נפתח מוסתר אוטומטית. באפליקציה עצמה כל הערוצים עובדים, יש בדיקת ערוצים, מדריך שידורים, הקלטה ועוד.
 </footer>
 
 <div class="player" id="player">
@@ -82,8 +107,22 @@
     <button id="next" title="הערוץ הבא">▼</button>
     <div class="t" id="ptitle"></div>
   </div>
-  <video id="video" controls playsinline autoplay></video>
-  <div class="msg" id="pmsg"></div>
+  <div class="vwrap">
+    <video id="video" playsinline autoplay></video>
+    <div class="msg" id="pmsg"></div>
+    <div class="ctrl" id="ctrl">
+      <button id="bBack30" title="30 שניות אחורה">⏪ 30</button>
+      <button id="bBack10" title="10 שניות אחורה">↺ 10</button>
+      <button id="bPlay" title="עצור / נגן">⏸</button>
+      <button id="bFwd10" title="10 שניות קדימה">10 ↻</button>
+      <button id="bLive" class="live on" title="חזור לשידור חי">● LIVE</button>
+      <button id="bMute" title="השתק (M)">🔊</button>
+      <input id="vol" type="range" min="0" max="1" step="0.05" value="1" aria-label="עוצמה">
+      <button id="bFav" title="מועדפים">☆</button>
+      <button id="bPip" title="תמונה בתוך תמונה">⧉</button>
+      <button id="bFull" title="מסך מלא (F)">⛶</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
@@ -107,6 +146,12 @@ const GROUPS = {Animation:'אנימציה',Auto:'רכב',Business:'עסקים',C
 const PAGE = 120;
 const $ = id => document.getElementById(id);
 let channels = [], shown = [], group = null, limit = PAGE, current = -1, hls = null;
+let tab = 'all';
+let favs = load('kwFavs', []);      // channel keys
+let recent = load('kwRecent', []);  // channel keys, newest first
+// Links that didn't open in this browser: hidden next time.
+const bad = new Set(load('kwBad', []));
+function markBad(url) { bad.add(url); save('kwBad', [...bad].slice(-3000)); }
 
 function load(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } }
 function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
@@ -118,7 +163,7 @@ function parseM3u(text) {
     if (line.startsWith('#EXTINF')) {
       const attr = k => (line.match(new RegExp(k + '="([^"]*)"')) || [])[1] || '';
       const name = line.slice(line.indexOf(',', line.lastIndexOf('"') + 1) + 1).trim() || attr('tvg-name');
-      cur = { name, logo: attr('tvg-logo'), group: attr('group-title'), needsHeaders: /http-referrer|http-user-agent/.test(line) };
+      cur = { name, id: attr('tvg-id'), logo: attr('tvg-logo'), group: attr('group-title'), country: attr('tvg-country'), needsHeaders: /http-referrer|http-user-agent/.test(line) };
     } else if (line.startsWith('#EXTVLCOPT')) {
       if (cur) cur.needsHeaders = true;
     } else if (line && !line.startsWith('#') && cur) {
@@ -131,6 +176,10 @@ function parseM3u(text) {
 // Only what a browser can play: secure (https) links without special headers.
 function playable(c) { return c.url.startsWith('https://') && !c.needsHeaders && !/youtube\.com|youtu\.be/.test(c.url); }
 function clean(n) { return n.replace(/\[[^\]]*\]/g, '').replace(/\(\s*\d{3,4}[pi]\s*\)/g, '').replace(/\s+/g, ' ').trim(); }
+// Same channel in different lists: tvg-id without "@feed", else the name.
+function idKey(id) { return id ? 'i:' + id.split('@')[0].toLowerCase() : ''; }
+function nameKey(n) { return 'n:' + clean(n).toLowerCase().replace(/\b(hd|fhd|uhd|sd|4k|tv)\b/g, '').replace(/[^\p{L}\p{N}]+/gu, ''); }
+function keyOf(c) { return idKey(c.id) || nameKey(c.name); }
 function groupsOf(c) { return (c.group || 'Undefined').split(';').map(s => s.trim()).filter(Boolean); }
 function label(g) { return GROUPS[g] || g; }
 const COLORS = ['#7b8a2b','#5a4bc7','#3b8ca0','#2f8f6f','#b0453a','#a24b8f','#b8862b','#3f6fb5'];
@@ -142,9 +191,16 @@ async function loadList(url) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(res.status);
     const all = parseM3u(await res.text());
-    const seen = new Set();
-    channels = all.filter(c => playable(c) && !seen.has(c.url) && seen.add(c.url))
-      .map(c => ({ ...c, name: clean(c.name) }));
+    // One card per channel, with all its working links.
+    const byKey = new Map();
+    for (const c of all) {
+      if (!playable(c) || bad.has(c.url)) continue;
+      const k = keyOf(c);
+      const card = byKey.get(k);
+      if (card) { if (!card.urls.includes(c.url)) card.urls.push(c.url); if (!card.logo) card.logo = c.logo; }
+      else byKey.set(k, { ...c, name: clean(c.name), key: k, urls: [c.url] });
+    }
+    channels = [...byKey.values()];
     group = null; limit = PAGE;
     renderChips(); render();
   } catch (e) {
@@ -169,8 +225,12 @@ function renderChips() {
 
 function render() {
   const q = $('q').value.trim().toLowerCase();
-  shown = channels.filter(c => (!group || groupsOf(c).includes(group)) && (!q || c.name.toLowerCase().includes(q)));
-  $('info').textContent = shown.length ? shown.length + ' ערוצים' : 'לא נמצאו ערוצים.';
+  let base = channels;
+  if (tab === 'fav') base = favs.map(k => channels.find(c => c.key === k)).filter(Boolean);
+  if (tab === 'recent') base = recent.map(k => channels.find(c => c.key === k)).filter(Boolean);
+  shown = base.filter(c => (!group || groupsOf(c).includes(group)) && (!q || c.name.toLowerCase().includes(q)));
+  if (!shown.length && tab !== 'all') { $('info').textContent = tab === 'fav' ? 'עוד אין מועדפים. לחץ ☆ על ערוץ כדי להוסיף.' : 'עוד לא צפית בערוצים מהרשימה הזו.'; }
+  if (shown.length || tab === 'all') $('info').textContent = shown.length ? shown.length + ' ערוצים' : 'לא נמצאו ערוצים.';
   const grid = $('grid'); grid.innerHTML = '';
   shown.slice(0, limit).forEach((c, i) => {
     const d = document.createElement('div');
@@ -179,7 +239,11 @@ function render() {
     const ini = () => { logo.innerHTML = ''; const s = document.createElement('div'); s.className = 'ini'; s.style.background = COLORS[c.name.length % COLORS.length]; s.textContent = initials(c.name); logo.appendChild(s); };
     if (c.logo) { const img = new Image(); img.loading = 'lazy'; img.alt = ''; img.src = c.logo; img.onerror = ini; logo.appendChild(img); } else ini();
     const n = document.createElement('div'); n.className = 'name'; n.textContent = c.name;
-    d.append(logo, n);
+    const st = document.createElement('button');
+    st.className = 'star' + (favs.includes(c.key) ? ' on' : ''); st.textContent = favs.includes(c.key) ? '★' : '☆';
+    st.title = 'מועדפים';
+    st.onclick = e => { e.stopPropagation(); toggleFav(c); render(); };
+    d.append(logo, n, st);
     d.onclick = () => play(i);
     d.onkeydown = e => { if (e.key === 'Enter') play(i); };
     grid.appendChild(d);
@@ -187,29 +251,162 @@ function render() {
   $('more').hidden = shown.length <= limit;
 }
 
+// Extra links from the big free lists, loaded once when a channel fails.
+let extraLinks = null;
+function loadExtraLinks() {
+  if (extraLinks) return extraLinks;
+  const lists = [IPTV + 'index.m3u', 'https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8'];
+  extraLinks = Promise.all(lists.map(u => fetch(u).then(r => r.ok ? r.text() : '').catch(() => '')))
+    .then(texts => {
+      const map = new Map();
+      for (const c of texts.flatMap(parseM3u)) {
+        if (!playable(c) || bad.has(c.url)) continue;
+        for (const k of [idKey(c.id), nameKey(c.name)]) {
+          if (!k || k === 'n:') continue;
+          if (!map.has(k)) map.set(k, []);
+          const arr = map.get(k); if (!arr.includes(c.url)) arr.push(c.url);
+        }
+      }
+      return map;
+    });
+  return extraLinks;
+}
+
+function toggleFav(c) {
+  favs = favs.includes(c.key) ? favs.filter(k => k !== c.key) : [...favs, c.key];
+  save('kwFavs', favs);
+}
+function addRecent(c) {
+  recent = [c.key, ...recent.filter(k => k !== c.key)].slice(0, 30);
+  save('kwRecent', recent);
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  tab = b.dataset.tab; limit = PAGE;
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+
+// ---- Player controls ----
+const V = () => $('video');
+function behindLive() {
+  const v = V(); const r = v.seekable;
+  if (!r || !r.length) return 0;
+  return Math.max(0, r.end(r.length - 1) - v.currentTime);
+}
+function seekBy(sec) {
+  const v = V(); const r = v.seekable;
+  if (!r || !r.length) return;
+  v.currentTime = Math.min(Math.max(r.start(0), v.currentTime + sec), r.end(r.length - 1) - 1);
+  v.play().catch(() => {}); wake();
+}
+function goLive() { const v = V(); const r = v.seekable; if (r && r.length) v.currentTime = r.end(r.length - 1) - 1; v.play().catch(() => {}); wake(); }
+function updateCtrl() {
+  const v = V();
+  $('bPlay').textContent = v.paused ? '▶' : '⏸';
+  $('bMute').textContent = v.muted || v.volume === 0 ? '🔇' : '🔊';
+  const b = behindLive();
+  $('bLive').classList.toggle('on', b < 5);
+  $('bLive').textContent = b < 5 ? '● LIVE' : '-' + Math.floor(b / 60) + ':' + String(Math.floor(b % 60)).padStart(2, '0') + ' ⏭ לשידור חי';
+  const c = shown[current];
+  if (c) $('bFav').textContent = favs.includes(c.key) ? '★' : '☆';
+}
+setInterval(() => { if ($('player').classList.contains('show')) updateCtrl(); }, 1000);
+let idleTimer;
+function wake() {
+  $('player').classList.remove('idle');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { if (!V().paused) $('player').classList.add('idle'); }, 3500);
+  updateCtrl();
+}
+['mousemove', 'touchstart', 'click', 'keydown'].forEach(ev => $('player').addEventListener(ev, wake, { passive: true }));
+$('bPlay').onclick = () => { const v = V(); v.paused ? v.play().catch(() => {}) : v.pause(); wake(); };
+$('bBack30').onclick = () => seekBy(-30);
+$('bBack10').onclick = () => seekBy(-10);
+$('bFwd10').onclick = () => seekBy(10);
+$('bLive').onclick = goLive;
+$('bMute').onclick = () => { V().muted = !V().muted; wake(); };
+$('vol').oninput = e => { V().volume = +e.target.value; V().muted = false; save('kwVol', V().volume); wake(); };
+$('bFav').onclick = () => { const c = shown[current]; if (c) { toggleFav(c); wake(); render(); } };
+$('bPip').onclick = () => { const v = V(); (document.pictureInPictureElement ? document.exitPictureInPicture() : v.requestPictureInPicture?.())?.catch?.(() => {}); };
+$('bFull').onclick = () => { document.fullscreenElement ? document.exitFullscreen() : $('player').requestFullscreen?.(); };
+$('video').onclick = () => $('bPlay').onclick();
+V().volume = load('kwVol', 1);
+$('vol').value = V().volume;
+if (!document.pictureInPictureEnabled) $('bPip').hidden = true;
+
+let playToken = 0;
 function play(i) {
   current = (i + shown.length) % shown.length;
   const c = shown[current];
+  const token = ++playToken;
   $('player').classList.add('show');
   $('ptitle').textContent = c.name;
   const msg = $('pmsg'); msg.className = 'msg'; msg.textContent = 'טוען…';
   const v = $('video');
-  if (hls) { hls.destroy(); hls = null; }
-  const fail = () => { msg.className = 'msg err'; msg.textContent = 'הערוץ הזה לא נפתח בדפדפן כרגע. נסה ערוץ אחר (▼), או צפה בו באפליקציה.'; };
-  v.onplaying = () => { msg.textContent = ''; };
-  v.onerror = fail;
-  if (window.Hls && Hls.isSupported() && !v.canPlayType('application/vnd.apple.mpegurl')) {
-    hls = new Hls({ maxBufferLength: 20 });
-    hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) fail(); });
-    hls.loadSource(c.url); hls.attachMedia(v);
-  } else {
-    v.src = c.url;
-  }
-  v.play().catch(() => {});
+  const tried = new Set();
+  let searched = false;
+
+  const giveUp = () => {
+    msg.className = 'msg err';
+    msg.textContent = 'הערוץ הזה לא נפתח בדפדפן, וגם לא נמצא לו קישור חלופי שעובד. הוא יוסתר מעכשיו (באפליקציה הוא אולי יעבוד).';
+    const b = document.createElement('button'); b.textContent = 'לערוץ הבא ▼';
+    b.onclick = () => play(current + 1);
+    msg.appendChild(document.createElement('br')); msg.appendChild(b);
+  };
+
+  const next = async () => {
+    if (token !== playToken) return;
+    let url = c.urls.find(u => !tried.has(u) && !bad.has(u));
+    if (!url && !searched) {
+      searched = true;
+      msg.className = 'msg'; msg.textContent = 'מחפש קישור חלופי לערוץ…';
+      const map = await loadExtraLinks();
+      if (token !== playToken) return;
+      const extra = [...(map.get(idKey(c.id)) || []), ...(map.get(nameKey(c.name)) || [])];
+      for (const u of extra) if (!c.urls.includes(u)) c.urls.push(u);
+      url = c.urls.find(u => !tried.has(u) && !bad.has(u));
+    }
+    if (!url) return giveUp();
+    tried.add(url);
+    tryUrl(url);
+  };
+
+  const tryUrl = url => {
+    if (hls) { hls.destroy(); hls = null; }
+    let settled = false;
+    const failed = () => {
+      if (settled || token !== playToken) return; settled = true;
+      clearTimeout(timer); markBad(url); next();
+    };
+    // No picture after 12 seconds counts as not working.
+    const timer = setTimeout(() => { if (v.readyState < 2) failed(); }, 12000);
+    v.onplaying = () => {
+      if (token !== playToken) return;
+      settled = true; clearTimeout(timer); msg.textContent = '';
+      addRecent(c); wake();
+      // Remember the working link first for next time.
+      c.urls = [url, ...c.urls.filter(u => u !== url)];
+    };
+    v.onerror = failed;
+    if (window.Hls && Hls.isSupported() && !v.canPlayType('application/vnd.apple.mpegurl')) {
+      hls = new Hls({ maxBufferLength: 20 });
+      hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) failed(); });
+      hls.loadSource(url); hls.attachMedia(v);
+    } else {
+      v.src = url;
+    }
+    v.play().catch(() => {});
+  };
+  next();
 }
 
 function closePlayer() {
+  playToken++;
   $('player').classList.remove('show');
+  // Hide channels that failed while watching.
+  const before = channels.length;
+  channels = channels.filter(c => c.urls.some(u => !bad.has(u)));
+  if (channels.length !== before) { renderChips(); render(); }
   if (hls) { hls.destroy(); hls = null; }
   const v = $('video'); v.pause(); v.removeAttribute('src'); v.load();
 }
@@ -221,8 +418,12 @@ document.addEventListener('keydown', e => {
   if (!$('player').classList.contains('show')) return;
   if (e.key === 'Escape') closePlayer();
   if (e.key === 'ArrowDown') play(current + 1);
+  if (e.key === ' ') { e.preventDefault(); $('bPlay').onclick(); }
+  if (e.key === 'ArrowLeft') seekBy(-10);
+  if (e.key === 'ArrowRight') seekBy(10);
+  if (e.key === 'l' || e.key === 'L') goLive();
   if (e.key === 'ArrowUp') play(current - 1);
-  if (e.key === 'f' || e.key === 'F') $('video').requestFullscreen?.();
+  if (e.key === 'f' || e.key === 'F') $('bFull').onclick();
   if (e.key === 'm' || e.key === 'M') $('video').muted = !$('video').muted;
 });
 $('more').onclick = () => { limit += PAGE; render(); };
