@@ -1,18 +1,22 @@
 {
-  "versionCode": 21,
-  "versionName": "1.4.0",
+  "versionCode": 26,
+  "versionName": "1.5.4",
   "notes": {
-    "he": "KiloWatch 1.4.0: ממשק כמו בממיר – רשימת ערוצים מעל השידור, פס מידע במעבר ערוץ, מצב טלוויזיה במחשב. ערוץ שלא עולה: חיפוש קישור חלופי אוטומטי, ואם לא נמצא – אפשרות להסתיר אותו.",
-    "en": "KiloWatch 1.4.0: set-top box interface – channel list over the video, info banner on channel change, TV mode on PC. A channel that won't start: automatic replacement search, then an option to hide it."
+    "he": "KiloWatch 1.5.4: כתוביות אוטומטיות (ניסיוני) עם תרגום לעברית בטלפון; מדור מבוגרים כקטגוריה; תיקון הקלטה ועדכון אוטומטי; גלילה חלקה; ממשק כמו בממיר.",
+    "en": "KiloWatch 1.5.4: automatic captions (beta) with Hebrew translation on phones; adult section as a category; recording and auto-update fixes; smooth scrolling; set-top box interface."
   },
   "apks": {
-    "arm64-v8a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.4.0-arm64-v8a.apk",
-    "armeabi-v7a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.4.0-armeabi-v7a.apk",
-    "x86_64": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.4.0-x86_64.apk"
+    "arm64-v8a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-arm64-v8a.apk",
+    "armeabi-v7a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-armeabi-v7a.apk",
+    "x86_64": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-x86_64.apk"
   },
   "sha256": {
-    "arm64-v8a": "bb0b6d933b6dc9bab1d5038a462b97555b3bd57c9da246abfef6c2ddd81f3ac8",
-    "armeabi-v7a": "5d66f7c3166e9614c2634b426123750defc2474ab1d600626eea1eb73cc4ec63",
-    "x86_64": "9e325af660da6e858b33c42042ac658d5b4dad2975e52019f00ddc81a45fda74"
+    "arm64-v8a": "920f517c7e7a14bf4a6b52aaa72f55e4a7b1e07bfb1598d212b17b3eb76673eb",
+    "armeabi-v7a": "636491d6432ef043d7eac5d2354e626d0d89fe47b698b61773d1f3fe109a24a1",
+    "x86_64": "62c56d7dd2952e86390d10ff044f938d0bf72d02f956db93aab79aec2007cda4"
+  },
+  "windows": {
+    "url": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-Setup.exe",
+    "sha256": "f8fd2d9eeadd89cfc81eda0c0e601d636eadd11d3c723793093b3394f67d6210"
   }
 }
