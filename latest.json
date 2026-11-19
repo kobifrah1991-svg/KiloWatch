@@ -1,0 +1,18 @@
+{
+  "versionCode": 20,
+  "versionName": "1.3.2",
+  "notes": {
+    "he": "KiloWatch 1.3.2: שם ואייקון חדשים, עדכון אוטומטי גם במחשב, מיון לפי מדינה ושפה, קישורים חלופיים לערוצים שבורים, פס גלילה אחורה בשידור חי, מדור נעול למבוגרים.",
+    "en": "KiloWatch 1.3.2: new name and icon, auto-update on Windows too, sort by country and language, replacement links for broken channels, live rewind bar, locked adult section."
+  },
+  "apks": {
+    "arm64-v8a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.3.2-arm64-v8a.apk",
+    "armeabi-v7a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.3.2-armeabi-v7a.apk",
+    "x86_64": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.3.2-x86_64.apk"
+  },
+  "sha256": {
+    "arm64-v8a": "e73677b2a94f383ce02ef2e88ca6265321657162cd2ea98adb788372b62e0386",
+    "armeabi-v7a": "f8651a1113c817df2234af9d8419c27f69435053d93d2d457329d5a8c71dd469",
+    "x86_64": "94ca9b657de38c0cbe3719e9d43c6d9c2b3ac947fb6bff6da64d35c3c716357b"
+  }
+}

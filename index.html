@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KiloWatch – הורדה</title>
+<link rel="icon" href="icon.png">
+<style>
+  :root{--bg:#0B0B0F;--card:#16161D;--line:#2C2C38;--acc:#1FC7A8;--on:#00201A;--txt:#F2F2F5;--sub:#A0A0AE}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Rubik,Arial,sans-serif;line-height:1.5}
+  main{max-width:720px;margin:0 auto;padding:40px 16px 64px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  header img{width:72px;height:72px;border-radius:18px}
+  h1{margin:0;font-size:34px;direction:ltr}
+  h1 b{color:var(--acc)}
+  .lead{color:var(--sub);margin:4px 0 28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
+  .card h2{margin:0 0 4px;font-size:20px}
+  .card p{margin:0 0 14px;color:var(--sub);font-size:15px}
+  a.btn{display:inline-block;background:var(--acc);color:var(--on);font-weight:700;text-decoration:none;padding:12px 20px;border-radius:12px}
+  a.btn.alt{background:transparent;color:var(--acc);border:1px solid var(--acc);margin-inline-start:8px}
+  .ver{color:var(--sub);font-size:14px;margin-bottom:24px}
+  ol{padding-inline-start:20px;color:var(--sub)}
+  footer{color:var(--sub);font-size:13px;margin-top:32px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icon.png" alt="">
+    <h1>Kilo<b>Watch</b></h1>
+  </header>
+  <p class="lead">נגן ערוצים אישי: בלי פרסומות, בלי מנוי ובלי חשבון.</p>
+  <div class="ver" id="ver">טוען גרסה אחרונה…</div>
+
+  <section class="card">
+    <h2>📱 טלפון אנדרואיד</h2>
+    <p>מתאים לרוב הטלפונים מהשנים האחרונות.</p>
+    <a class="btn" id="phone" href="#">הורדה לטלפון</a>
+  </section>
+
+  <section class="card">
+    <h2>📺 ממיר טלוויזיה / טלפון ישן</h2>
+    <p>לממירי Android TV ולמכשירים ישנים.</p>
+    <a class="btn" id="tv" href="#">הורדה לממיר</a>
+  </section>
+
+  <section class="card">
+    <h2>💻 מחשב Windows</h2>
+    <p>קובץ התקנה רגיל. אחרי ההתקנה התוכנה מתעדכנת לבד.</p>
+    <a class="btn" id="win" href="#">הורדה למחשב</a>
+  </section>
+
+  <section class="card">
+    <h2>איך מתקינים בטלפון</h2>
+    <ol>
+      <li>לחץ "הורדה לטלפון" וחכה שההורדה תסתיים.</li>
+      <li>פתח את הקובץ שירד ולחץ "התקן".</li>
+      <li>בפעם הראשונה אנדרואיד יבקש לאשר התקנה מהדפדפן: "הגדרות" ← "אפשר ממקור זה" ← חזור ולחץ "התקן".</li>
+    </ol>
+  </section>
+  <footer>לשימוש אישי. הערוצים מגיעים מרשימות ציבוריות שהמשתמש מוסיף.</footer>
+</main>
+<script>
+fetch('latest.json?t=' + Date.now()).then(r => r.json()).then(j => {
+  document.getElementById('ver').textContent = 'גרסה ' + j.versionName;
+  const a = j.apks || {};
+  if (a['arm64-v8a']) document.getElementById('phone').href = a['arm64-v8a'];
+  if (a['armeabi-v7a']) document.getElementById('tv').href = a['armeabi-v7a'];
+  if (j.windows && j.windows.url) document.getElementById('win').href = j.windows.url;
+  else document.getElementById('win').parentElement.querySelector('p').textContent = 'בקרוב.';
+}).catch(() => { document.getElementById('ver').textContent = ''; });
+</script>
+</body>
+</html>
