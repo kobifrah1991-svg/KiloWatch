@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KiloWatch – צפייה בדפדפן</title>
+<link rel="icon" href="icon.png">
+<style>
+  :root{--bg:#0B0B0F;--card:#16161D;--card2:#20202A;--line:#2C2C38;--acc:#1FC7A8;--on:#00201A;--txt:#F2F2F5;--sub:#A0A0AE;--err:#FF6B6B}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Rubik,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:rgba(11,11,15,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px}
+  .top{display:flex;align-items:center;gap:12px;max-width:1200px;margin:0 auto}
+  .top img{width:40px;height:40px;border-radius:10px}
+  .brand{font-weight:800;font-size:22px;direction:ltr}
+  .brand b{color:var(--acc)}
+  .top a{margin-inline-start:auto;color:var(--acc);text-decoration:none;font-size:14px;white-space:nowrap}
+  .controls{max-width:1200px;margin:10px auto 0;display:flex;gap:8px;flex-wrap:wrap}
+  select,input{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:15px}
+  input{flex:1;min-width:160px}
+  .chips{max-width:1200px;margin:10px auto 0;display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+  .chip{flex:none;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer}
+  .chip.on{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:700}
+  main{max-width:1200px;margin:0 auto;padding:16px}
+  .info{color:var(--sub);font-size:14px;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .ch{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s}
+  .ch:hover,.ch:focus{transform:scale(1.03);border-color:var(--acc);outline:none}
+  .logo{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:var(--card2);padding:10px}
+  .logo img{max-width:100%;max-height:100%;object-fit:contain}
+  .ini{font-weight:800;font-size:30px;color:#fff;width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:8px}
+  .name{padding:8px 6px 10px;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;unicode-bidi:plaintext}
+  .more{display:block;margin:20px auto;background:var(--card);color:var(--acc);border:1px solid var(--acc);border-radius:12px;padding:10px 24px;font:inherit;cursor:pointer}
+  .player{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
+  .player.show{display:flex}
+  .pbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#000}
+  .pbar button{background:var(--card);color:var(--txt);border:0;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
+  .pbar .t{font-weight:700;unicode-bidi:plaintext;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  video{flex:1;width:100%;min-height:0;background:#000}
+  .msg{position:absolute;inset:auto 0 40%;text-align:center;color:var(--txt);padding:0 20px;font-size:16px;pointer-events:none}
+  .msg.err{color:var(--err)}
+  .add{max-width:1200px;margin:24px auto 0;color:var(--sub);font-size:14px}
+  .add summary{cursor:pointer;color:var(--acc)}
+  .add form{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .add button{background:var(--acc);color:var(--on);border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+  footer{max-width:1200px;margin:24px auto 40px;padding:0 16px;color:var(--sub);font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <img src="icon.png" alt="">
+    <div class="brand">Kilo<b>Watch</b></div>
+    <a href="./">⬇ להורדת האפליקציה</a>
+  </div>
+  <div class="controls">
+    <select id="list" aria-label="רשימה"></select>
+    <input id="q" type="search" placeholder="חיפוש ערוץ…" aria-label="חיפוש">
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+<main>
+  <p class="info" id="info">טוען ערוצים…</p>
+  <div class="grid" id="grid"></div>
+  <button class="more" id="more" hidden>הצג עוד</button>
+  <details class="add">
+    <summary>הוספת רשימה משלך (קישור M3U)</summary>
+    <form id="addForm">
+      <input id="addUrl" type="url" dir="ltr" placeholder="https://…/list.m3u" required>
+      <button>הוסף</button>
+    </form>
+  </details>
+</main>
+<footer>
+  צפייה בדפדפן בלי התקנה. חלק מהערוצים לא נפתחים בדפדפן (כתובות לא מאובטחות או ערוצים שחוסמים אתרים), והם מוסתרים כאן. באפליקציה עצמה כל הערוצים עובדים, יש בדיקת ערוצים, מדריך שידורים, הקלטה ועוד.
+</footer>
+
+<div class="player" id="player">
+  <div class="pbar">
+    <button id="close">✕ סגור</button>
+    <button id="prev" title="הערוץ הקודם">▲</button>
+    <button id="next" title="הערוץ הבא">▼</button>
+    <div class="t" id="ptitle"></div>
+  </div>
+  <video id="video" controls playsinline autoplay></video>
+  <div class="msg" id="pmsg"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script>
+const IPTV = 'https://iptv-org.github.io/iptv/';
+const LISTS = [
+  ['ישראל ועברית', IPTV + 'languages/heb.m3u'],
+  ['חדשות', IPTV + 'categories/news.m3u'],
+  ['ספורט', IPTV + 'categories/sports.m3u'],
+  ['ילדים', IPTV + 'categories/kids.m3u'],
+  ['סרטים', IPTV + 'categories/movies.m3u'],
+  ['סדרות', IPTV + 'categories/series.m3u'],
+  ['מוזיקה', IPTV + 'categories/music.m3u'],
+  ['דוקו', IPTV + 'categories/documentary.m3u'],
+  ['לייף-סטייל ואופנה', IPTV + 'categories/lifestyle.m3u'],
+  ['ערבית', IPTV + 'languages/ara.m3u'],
+  ['רוסית', IPTV + 'languages/rus.m3u'],
+  ['אנגלית', IPTV + 'languages/eng.m3u'],
+];
+const GROUPS = {Animation:'אנימציה',Auto:'רכב',Business:'עסקים',Classic:'קלאסי',Comedy:'קומדיה',Cooking:'בישול',Culture:'תרבות',Documentary:'דוקו',Education:'חינוך',Entertainment:'בידור',Family:'משפחה',General:'כללי',Kids:'ילדים',Legislative:'פרלמנט',Lifestyle:'לייף-סטייל',Movies:'סרטים',Music:'מוזיקה',News:'חדשות',Outdoor:'אאוטדור',Relax:'רגיעה',Religious:'דת',Science:'מדע',Series:'סדרות',Shop:'קניות',Sports:'ספורט',Travel:'טיולים',Weather:'מזג אוויר',Undefined:'אחר'};
+const PAGE = 120;
+const $ = id => document.getElementById(id);
+let channels = [], shown = [], group = null, limit = PAGE, current = -1, hls = null;
+
+function load(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } }
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
+
+function parseM3u(text) {
+  const out = []; let cur = null;
+  for (let line of text.split(/\r?\n/)) {
+    line = line.trim().replace(/^﻿/, '');
+    if (line.startsWith('#EXTINF')) {
+      const attr = k => (line.match(new RegExp(k + '="([^"]*)"')) || [])[1] || '';
+      const name = line.slice(line.indexOf(',', line.lastIndexOf('"') + 1) + 1).trim() || attr('tvg-name');
+      cur = { name, logo: attr('tvg-logo'), group: attr('group-title'), needsHeaders: /http-referrer|http-user-agent/.test(line) };
+    } else if (line.startsWith('#EXTVLCOPT')) {
+      if (cur) cur.needsHeaders = true;
+    } else if (line && !line.startsWith('#') && cur) {
+      cur.url = line; out.push(cur); cur = null;
+    }
+  }
+  return out;
+}
+
+// Only what a browser can play: secure (https) links without special headers.
+function playable(c) { return c.url.startsWith('https://') && !c.needsHeaders && !/youtube\.com|youtu\.be/.test(c.url); }
+function clean(n) { return n.replace(/\[[^\]]*\]/g, '').replace(/\(\s*\d{3,4}[pi]\s*\)/g, '').replace(/\s+/g, ' ').trim(); }
+function groupsOf(c) { return (c.group || 'Undefined').split(';').map(s => s.trim()).filter(Boolean); }
+function label(g) { return GROUPS[g] || g; }
+const COLORS = ['#7b8a2b','#5a4bc7','#3b8ca0','#2f8f6f','#b0453a','#a24b8f','#b8862b','#3f6fb5'];
+function initials(n) { const w = n.split(/\s+/).filter(Boolean); return ((w[0]||'?')[0] + (w[1] ? w[1][0] : (w[0]||'')[1] || '')).toUpperCase(); }
+
+async function loadList(url) {
+  $('info').textContent = 'טוען ערוצים…'; $('grid').innerHTML = ''; $('chips').innerHTML = '';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const all = parseM3u(await res.text());
+    const seen = new Set();
+    channels = all.filter(c => playable(c) && !seen.has(c.url) && seen.add(c.url))
+      .map(c => ({ ...c, name: clean(c.name) }));
+    group = null; limit = PAGE;
+    renderChips(); render();
+  } catch (e) {
+    $('info').textContent = 'לא הצלחתי לטעון את הרשימה. בדוק את החיבור לאינטרנט ונסה שוב.';
+  }
+}
+
+function renderChips() {
+  const counts = {};
+  for (const c of channels) for (const g of groupsOf(c)) counts[g] = (counts[g] || 0) + 1;
+  const gs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  const chips = $('chips'); chips.innerHTML = '';
+  const add = (g, text) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (group === g ? ' on' : ''); b.textContent = text;
+    b.onclick = () => { group = g; limit = PAGE; renderChips(); render(); };
+    chips.appendChild(b);
+  };
+  add(null, 'הכול');
+  if (gs.length > 1) gs.forEach(g => add(g, label(g)));
+}
+
+function render() {
+  const q = $('q').value.trim().toLowerCase();
+  shown = channels.filter(c => (!group || groupsOf(c).includes(group)) && (!q || c.name.toLowerCase().includes(q)));
+  $('info').textContent = shown.length ? shown.length + ' ערוצים' : 'לא נמצאו ערוצים.';
+  const grid = $('grid'); grid.innerHTML = '';
+  shown.slice(0, limit).forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'ch'; d.tabIndex = 0;
+    const logo = document.createElement('div'); logo.className = 'logo';
+    const ini = () => { logo.innerHTML = ''; const s = document.createElement('div'); s.className = 'ini'; s.style.background = COLORS[c.name.length % COLORS.length]; s.textContent = initials(c.name); logo.appendChild(s); };
+    if (c.logo) { const img = new Image(); img.loading = 'lazy'; img.alt = ''; img.src = c.logo; img.onerror = ini; logo.appendChild(img); } else ini();
+    const n = document.createElement('div'); n.className = 'name'; n.textContent = c.name;
+    d.append(logo, n);
+    d.onclick = () => play(i);
+    d.onkeydown = e => { if (e.key === 'Enter') play(i); };
+    grid.appendChild(d);
+  });
+  $('more').hidden = shown.length <= limit;
+}
+
+function play(i) {
+  current = (i + shown.length) % shown.length;
+  const c = shown[current];
+  $('player').classList.add('show');
+  $('ptitle').textContent = c.name;
+  const msg = $('pmsg'); msg.className = 'msg'; msg.textContent = 'טוען…';
+  const v = $('video');
+  if (hls) { hls.destroy(); hls = null; }
+  const fail = () => { msg.className = 'msg err'; msg.textContent = 'הערוץ הזה לא נפתח בדפדפן כרגע. נסה ערוץ אחר (▼), או צפה בו באפליקציה.'; };
+  v.onplaying = () => { msg.textContent = ''; };
+  v.onerror = fail;
+  if (window.Hls && Hls.isSupported() && !v.canPlayType('application/vnd.apple.mpegurl')) {
+    hls = new Hls({ maxBufferLength: 20 });
+    hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) fail(); });
+    hls.loadSource(c.url); hls.attachMedia(v);
+  } else {
+    v.src = c.url;
+  }
+  v.play().catch(() => {});
+}
+
+function closePlayer() {
+  $('player').classList.remove('show');
+  if (hls) { hls.destroy(); hls = null; }
+  const v = $('video'); v.pause(); v.removeAttribute('src'); v.load();
+}
+
+$('close').onclick = closePlayer;
+$('next').onclick = () => play(current + 1);
+$('prev').onclick = () => play(current - 1);
+document.addEventListener('keydown', e => {
+  if (!$('player').classList.contains('show')) return;
+  if (e.key === 'Escape') closePlayer();
+  if (e.key === 'ArrowDown') play(current + 1);
+  if (e.key === 'ArrowUp') play(current - 1);
+  if (e.key === 'f' || e.key === 'F') $('video').requestFullscreen?.();
+  if (e.key === 'm' || e.key === 'M') $('video').muted = !$('video').muted;
+});
+$('more').onclick = () => { limit += PAGE; render(); };
+let t; $('q').oninput = () => { clearTimeout(t); t = setTimeout(() => { limit = PAGE; render(); }, 200); };
+
+const own = load('kwOwnLists', []);
+function fillLists() {
+  const sel = $('list'); sel.innerHTML = '';
+  [...LISTS, ...own.map(u => ['הרשימה שלי: ' + (new URL(u).pathname.split('/').pop() || u), u])].forEach(([n, u]) => {
+    const o = document.createElement('option'); o.value = u; o.textContent = n; sel.appendChild(o);
+  });
+  sel.value = load('kwList', LISTS[0][1]);
+  if (!sel.value) sel.value = LISTS[0][1];
+}
+$('list').onchange = () => { save('kwList', $('list').value); loadList($('list').value); };
+$('addForm').onsubmit = e => {
+  e.preventDefault();
+  const u = $('addUrl').value.trim();
+  if (!own.includes(u)) { own.push(u); save('kwOwnLists', own); }
+  save('kwList', u); fillLists(); loadList(u); $('addUrl').value = '';
+};
+fillLists();
+loadList($('list').value);
+</script>
+</body>
+</html>
