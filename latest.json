@@ -1,22 +1,22 @@
 {
-  "versionCode": 26,
-  "versionName": "1.5.4",
+  "versionCode": 27,
+  "versionName": "1.5.5",
   "notes": {
-    "he": "KiloWatch 1.5.4: כתוביות אוטומטיות (ניסיוני) עם תרגום לעברית בטלפון; מדור מבוגרים כקטגוריה; תיקון הקלטה ועדכון אוטומטי; גלילה חלקה; ממשק כמו בממיר.",
-    "en": "KiloWatch 1.5.4: automatic captions (beta) with Hebrew translation on phones; adult section as a category; recording and auto-update fixes; smooth scrolling; set-top box interface."
+    "he": "KiloWatch 1.5.5: אבחון כתוביות (מוצג שלב ושגיאה), תרגום לעברית לא מכשיל יותר את הכתוביות; גלילה חלקה; עדכון אוטומטי מתוקן.",
+    "en": "KiloWatch 1.5.5: caption diagnostics (shows stage and error), translation failures no longer stop captions; smooth scrolling; fixed auto-update."
   },
   "apks": {
-    "arm64-v8a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-arm64-v8a.apk",
-    "armeabi-v7a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-armeabi-v7a.apk",
-    "x86_64": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-x86_64.apk"
+    "arm64-v8a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.5-arm64-v8a.apk",
+    "armeabi-v7a": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.5-armeabi-v7a.apk",
+    "x86_64": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.5-x86_64.apk"
   },
   "sha256": {
-    "arm64-v8a": "920f517c7e7a14bf4a6b52aaa72f55e4a7b1e07bfb1598d212b17b3eb76673eb",
-    "armeabi-v7a": "636491d6432ef043d7eac5d2354e626d0d89fe47b698b61773d1f3fe109a24a1",
-    "x86_64": "62c56d7dd2952e86390d10ff044f938d0bf72d02f956db93aab79aec2007cda4"
+    "arm64-v8a": "1b109cf76447fbeee1eb6ee61699c059559f93da4947a0b408e1841eafeb582f",
+    "armeabi-v7a": "b7c22d2d744ee971b18a97fe3f741371faca3629ae9846fdbf3ccfc63069bdf1",
+    "x86_64": "3d908d01139f91305af0feb2a1d838491502ff41e8f7791c35b71e8fe1006513"
   },
   "windows": {
-    "url": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.4-Setup.exe",
-    "sha256": "f8fd2d9eeadd89cfc81eda0c0e601d636eadd11d3c723793093b3394f67d6210"
+    "url": "https://raw.githubusercontent.com/kobifrah1991-svg/KiloWatch/main/KiloWatch-1.5.5-Setup.exe",
+    "sha256": "0227f417dfc1b972e84f282a97f1f3646d37a591c5397bf598b5925f1d706aa6"
   }
 }
